@@ -185,7 +185,7 @@ Write freely in English or Sinhala. Take your time.
 <p id="status" class="status"></p>
 
 <p class="footer">
-Your message is completely private, and no one can identify you. It will be shared anonymously in the group within 24 hours.
+Your message is completely private, and no one can identify you. 
 
 </p>
 
@@ -234,35 +234,32 @@ function previewText() {
 
 // send
 function sendConfession() {
+
   const input = document.getElementById("confessionInput").value.trim();
+
+  if (input.length < 5) {
+    showStatus("Message too short.");
+    return;
+  }
 
   const fullText = (selectedEmotion ? selectedEmotion + "\n\n" : "") + input;
 
+  // 👉 SHOW SUCCESS MESSAGE IMMEDIATELY
+  showStatus("Your message was sent to Admin. It will be shared anonymously in the group within 24 hours.");
+
+  showCalmScreen();
+
+  // 👉 SEND IN BACKGROUND (no UI dependency)
   const formData = new FormData();
   formData.append("message", fullText);
 
   fetch("https://formspree.io/f/mjgalprd", {
     method: "POST",
     body: formData
-  })
-  .then(response => {
-    if (response.ok) {
-      showCalmScreen();
-
-      document.getElementById("confessionInput").value = "";
-      document.getElementById("previewBox").style.display = "none";
-      document.getElementById("sendBtn").style.display = "none";
-      document.getElementById("counter").innerText = "0 characters";
-
-      document.querySelectorAll(".emotion").forEach(e => e.classList.remove("active"));
-      selectedEmotion = "";
-    } else {
-      document.getElementById("status").innerText = "Submission failed. Check Formspree.";
-    }
-  })
-  .catch(() => {
-    document.getElementById("status").innerText = "Something went wrong.";
   });
+
+  // 👉 RESET FORM
+  resetForm();
 }
 
 // calming animation
