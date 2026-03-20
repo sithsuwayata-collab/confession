@@ -1,41 +1,293 @@
-function sendConfession() {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  const inputEl = document.getElementById("confessionInput");
-  const statusEl = document.getElementById("status");
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala&display=swap" rel="stylesheet">
 
-  const input = inputEl.value.trim();
+<title>Confession Wall</title>
 
-  if (input.length < 5) {
-    statusEl.innerText = "Message too short.";
+<style>
+
+body {
+  margin:0;
+  font-family:'Noto Sans Sinhala', sans-serif;
+  background:#e8f5e9;
+}
+
+.container {
+  max-width:600px;
+  margin:40px auto;
+  padding:20px;
+  background:linear-gradient(135deg,#1b5e20,#2e7d32);
+  border-radius:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+  color:#f1f8e9;
+}
+
+/* TEXTAREA */
+textarea {
+  width:100%;
+  box-sizing:border-box;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid #81c784;
+  resize:none;
+  outline:none;
+  font-size:16px;
+  color:#1b5e20;
+  line-height:28px;
+  background:repeating-linear-gradient(
+    to bottom,
+    #ffffff,
+    #ffffff 28px,
+    #c8e6c9 29px
+  );
+}
+
+/* BUTTON AREA */
+.btn-area {
+  text-align:center;
+  margin-top:12px;
+}
+
+button {
+  padding:8px 18px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  color:white;
+  font-size:14px;
+  transition:0.2s;
+}
+
+button:hover {
+  opacity:0.85;
+}
+
+/* BUTTON COLORS */
+.btn-preview { background:#43a047; }
+.btn-send { background:#1b5e20; }
+
+/* EMOTIONS */
+.emotions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:10px 0;
+}
+
+.emotion {
+  padding:6px 10px;
+  border-radius:20px;
+  background:#66bb6a;
+  cursor:pointer;
+  font-size:13px;
+}
+
+.emotion.active {
+  background:#a5d6a7;
+  color:#1b5e20;
+  font-weight:bold;
+}
+
+/* PREVIEW */
+.preview {
+  display:none;
+  background:#f1f8e9;
+  color:#1b5e20;
+  padding:15px;
+  border-radius:12px;
+  margin-top:15px;
+  white-space:pre-wrap;
+}
+
+/* STATUS */
+.status {
+  margin-top:10px;
+  padding:10px;
+  border-radius:8px;
+  font-size:14px;
+  background:rgba(255,255,255,0.1);
+  color:#dcedc8;
+}
+
+/* COUNTER */
+.counter {
+  font-size:12px;
+  text-align:right;
+  color:#c8e6c9;
+}
+
+/* CALM SCREEN */
+.calm-screen {
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:#1b5e20;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  color:#e8f5e9;
+}
+
+.breath {
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  background:#a5d6a7;
+  animation:breathe 4s infinite;
+}
+
+@keyframes breathe {
+  0% { transform:scale(1); }
+  50% { transform:scale(1.5); }
+  100% { transform:scale(1); }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>🌿 Confession Wall</h2>
+<p>A quiet place to let things out. No names. No judgment.</p>
+
+<!-- EMOTIONS -->
+<div class="emotions">
+  <div class="emotion">😔 Sad</div>
+  <div class="emotion">😡 Angry</div>
+  <div class="emotion">😕 Confused</div>
+  <div class="emotion">😞 Tired</div>
+  <div class="emotion">😢 Hurt</div>
+  <div class="emotion">😶 Empty</div>
+</div>
+
+<!-- TEXTAREA -->
+<textarea id="confessionInput" rows="6" placeholder="Write your thoughts..."></textarea>
+
+<div class="counter" id="counter">0 characters</div>
+
+<!-- PREVIEW BUTTON -->
+<div class="btn-area">
+  <button class="btn-preview" onclick="previewText()">Preview</button>
+</div>
+
+<!-- PREVIEW BOX -->
+<div id="previewBox" class="preview"></div>
+
+<!-- SEND BUTTON BELOW PREVIEW -->
+<div class="btn-area">
+  <button id="sendBtn" class="btn-send" onclick="sendConfession()" style="display:none;">
+    Send
+  </button>
+</div>
+
+<p id="status" class="status"></p>
+
+</div>
+
+<!-- CALM SCREEN -->
+<div class="calm-screen" id="calmScreen">
+  <div class="breath"></div>
+  <p>You did something important 💛</p>
+</div>
+
+<script>
+
+let selectedEmotion = "";
+
+// emotion select
+document.querySelectorAll(".emotion").forEach(el => {
+  el.onclick = () => {
+    document.querySelectorAll(".emotion").forEach(e => e.classList.remove("active"));
+    el.classList.add("active");
+    selectedEmotion = el.innerText;
+  };
+});
+
+// counter
+document.getElementById("confessionInput").addEventListener("input", function() {
+  document.getElementById("counter").innerText = this.value.length + " characters";
+});
+
+// preview
+function previewText(){
+  const input = document.getElementById("confessionInput").value.trim();
+
+  if(input.length < 5){
+    showStatus("Write a bit more before previewing.");
     return;
   }
 
-  const fullText = (selectedEmotion ? selectedEmotion + "\n\n" : "") + input;
+  const text = (selectedEmotion ? selectedEmotion + "\n\n" : "") + input;
 
-  // 👉 Show success immediately
-  statusEl.innerText =
-  "Your message was sent to Admin. It will be shared anonymously in the group within 24 hours.";
+  document.getElementById("previewBox").style.display="block";
+  document.getElementById("previewBox").innerText=text;
 
-  // 👉 Prepare data properly
-  const formData = new FormData();
-  formData.append("message", fullText);
+  document.getElementById("sendBtn").style.display="inline-block";
 
-  // 👉 Send silently
-  fetch("https://formspree.io/f/mjgalprd", {
-    method: "POST",
-    body: formData
-  }).catch(err => {
-    console.log("Background send error:", err);
-  });
+  showStatus("Preview ready. You can send now.");
+}
 
-  // 👉 Reset UI
-  inputEl.value = "";
-  document.getElementById("previewBox").style.display = "none";
-  document.getElementById("sendBtn").style.display = "none";
-  document.getElementById("counter").innerText = "0 characters";
+// send
+function sendConfession(){
 
-  document.querySelectorAll(".emotion").forEach(e => e.classList.remove("active"));
-  selectedEmotion = "";
+  const input = document.getElementById("confessionInput").value.trim();
+
+  if(input.length < 5){
+    showStatus("Message too short.");
+    return;
+  }
+
+  const text = (selectedEmotion ? selectedEmotion + "\n\n" : "") + input;
+
+  // show success instantly
+  showStatus("Your message was sent to Admin. It will be shared anonymously within 24 hours.");
 
   showCalmScreen();
+
+  // send silently
+  const formData = new FormData();
+  formData.append("message", text);
+
+  fetch("https://formspree.io/f/mjgalprd", {
+    method:"POST",
+    body:formData
+  });
+
+  // reset
+  document.getElementById("confessionInput").value="";
+  document.getElementById("previewBox").style.display="none";
+  document.getElementById("sendBtn").style.display="none";
+  document.getElementById("counter").innerText="0 characters";
+
+  document.querySelectorAll(".emotion").forEach(e => e.classList.remove("active"));
+  selectedEmotion="";
 }
+
+// helper
+function showStatus(msg){
+  document.getElementById("status").innerText = msg;
+}
+
+// calm screen
+function showCalmScreen(){
+  const screen = document.getElementById("calmScreen");
+  screen.style.display="flex";
+
+  setTimeout(()=>{
+    screen.style.display="none";
+  },3000);
+}
+
+</script>
+
+</body>
+</html>
