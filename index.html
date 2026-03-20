@@ -235,14 +235,45 @@ function previewText() {
 // send
 function sendConfession() {
 
-  const input = document.getElementById("confessionInput").value.trim();
+  const inputEl = document.getElementById("confessionInput");
+  const statusEl = document.getElementById("status");
+
+  const input = inputEl.value.trim();
 
   if (input.length < 5) {
-    showStatus("Message too short.");
+    statusEl.innerText = "Message too short.";
     return;
   }
 
   const fullText = (selectedEmotion ? selectedEmotion + "\n\n" : "") + input;
+
+  // 👉 Show success immediately
+  statusEl.innerText =
+  "Your message was sent to Admin. It will be shared anonymously in the group within 24 hours.";
+
+  // 👉 Prepare data properly
+  const formData = new FormData();
+  formData.append("message", fullText);
+
+  // 👉 Send silently
+  fetch("https://formspree.io/f/mjgalprd", {
+    method: "POST",
+    body: formData
+  }).catch(err => {
+    console.log("Background send error:", err);
+  });
+
+  // 👉 Reset UI
+  inputEl.value = "";
+  document.getElementById("previewBox").style.display = "none";
+  document.getElementById("sendBtn").style.display = "none";
+  document.getElementById("counter").innerText = "0 characters";
+
+  document.querySelectorAll(".emotion").forEach(e => e.classList.remove("active"));
+  selectedEmotion = "";
+
+  showCalmScreen();
+}
 
   // 👉 SHOW SUCCESS MESSAGE IMMEDIATELY
   showStatus("Your message was sent to Admin. It will be shared anonymously in the group within 24 hours.");
