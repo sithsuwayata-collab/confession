@@ -10,80 +10,56 @@
 
 <style>
 
+/* BACKGROUND */
 body {
   margin:0;
   font-family:'Noto Sans Sinhala', sans-serif;
-  background:#e8f5e9;
+  background:#dcedc8;
+  display:flex;
+  justify-content:center;
 }
 
-.container {
-  max-width:600px;
-  margin:40px auto;
-  padding:20px;
-  background:linear-gradient(135deg,#1b5e20,#2e7d32);
-  border-radius:16px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.25);
-  color:#f1f8e9;
-}
-
-/* TEXTAREA */
-textarea {
+/* APP FRAME */
+.app {
   width:100%;
-  box-sizing:border-box;
-  padding:14px;
-  border-radius:12px;
-  border:1px solid #81c784;
-  resize:none;
-  outline:none;
-  font-size:16px;
-  color:#1b5e20;
-  line-height:28px;
-  background:repeating-linear-gradient(
-    to bottom,
-    #ffffff,
-    #ffffff 28px,
-    #c8e6c9 29px
-  );
-}
-
-/* BUTTON AREA */
-.btn-area {
-  text-align:center;
-  margin-top:12px;
-}
-
-button {
-  padding:8px 18px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
+  max-width:420px;
+  min-height:100vh;
+  background:#1b5e20;
   color:white;
-  font-size:14px;
-  transition:0.2s;
+  display:flex;
+  flex-direction:column;
 }
 
-button:hover {
-  opacity:0.85;
+/* HEADER */
+.header {
+  padding:15px;
+  text-align:center;
+  font-size:18px;
+  font-weight:bold;
+  background:#144d18;
+  position:sticky;
+  top:0;
 }
 
-/* BUTTON COLORS */
-.btn-preview { background:#43a047; }
-.btn-send { background:#1b5e20; }
+/* CONTENT */
+.content {
+  padding:15px;
+}
 
 /* EMOTIONS */
 .emotions {
   display:flex;
   flex-wrap:wrap;
   gap:8px;
-  margin:10px 0;
+  margin-bottom:10px;
 }
 
 .emotion {
   padding:6px 10px;
   border-radius:20px;
-  background:#66bb6a;
+  background:#43a047;
+  font-size:12px;
   cursor:pointer;
-  font-size:13px;
 }
 
 .emotion.active {
@@ -92,36 +68,66 @@ button:hover {
   font-weight:bold;
 }
 
+/* TEXT AREA */
+textarea {
+  width:100%;
+  box-sizing:border-box;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  font-size:15px;
+  color:#1b5e20;
+  line-height:24px;
+  resize:none;
+}
+
+/* COUNTER */
+.counter {
+  text-align:right;
+  font-size:11px;
+  margin-top:4px;
+  color:#c8e6c9;
+}
+
+/* BUTTONS */
+.btn-area {
+  text-align:center;
+  margin-top:10px;
+}
+
+button {
+  padding:8px 18px;
+  border:none;
+  border-radius:20px;
+  font-size:13px;
+  cursor:pointer;
+}
+
+.btn-preview { background:#43a047; color:white; }
+.btn-send { background:#0d3b12; color:white; }
+
 /* PREVIEW */
 .preview {
   display:none;
-  background:#f1f8e9;
+  background:white;
   color:#1b5e20;
-  padding:15px;
+  padding:12px;
   border-radius:12px;
-  margin-top:15px;
+  margin-top:10px;
+  font-size:14px;
   white-space:pre-wrap;
 }
 
 /* STATUS */
 .status {
   margin-top:10px;
-  padding:10px;
-  border-radius:8px;
-  font-size:14px;
-  background:rgba(255,255,255,0.1);
-  color:#dcedc8;
-}
-
-/* COUNTER */
-.counter {
-  font-size:12px;
-  text-align:right;
+  font-size:13px;
+  text-align:center;
   color:#c8e6c9;
 }
 
 /* CALM SCREEN */
-.calm-screen {
+.calm {
   display:none;
   position:fixed;
   top:0;
@@ -132,15 +138,14 @@ button:hover {
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  color:#e8f5e9;
 }
 
-.breath {
+.circle {
   width:80px;
   height:80px;
   border-radius:50%;
   background:#a5d6a7;
-  animation:breathe 4s infinite;
+  animation: breathe 4s infinite;
 }
 
 @keyframes breathe {
@@ -154,10 +159,15 @@ button:hover {
 
 <body>
 
-<div class="container">
+<div class="app">
 
-<h2>🌿 Confession Wall</h2>
-<p>A quiet place to let things out. No names. No judgment.</p>
+<div class="header">🌿 Confession Wall</div>
+
+<div class="content">
+
+<p style="font-size:13px;color:#c8e6c9;text-align:center;">
+No names. No judgment.
+</p>
 
 <!-- EMOTIONS -->
 <div class="emotions">
@@ -166,125 +176,112 @@ button:hover {
   <div class="emotion">😕 Confused</div>
   <div class="emotion">😞 Tired</div>
   <div class="emotion">😢 Hurt</div>
-  <div class="emotion">😶 Empty</div>
 </div>
 
-<!-- TEXTAREA -->
-<textarea id="confessionInput" rows="6" placeholder="Write your thoughts..."></textarea>
+<textarea id="input" rows="5" placeholder="Write your thoughts..."></textarea>
 
-<div class="counter" id="counter">0 characters</div>
+<div class="counter" id="counter">0</div>
 
-<!-- PREVIEW BUTTON -->
 <div class="btn-area">
-  <button class="btn-preview" onclick="previewText()">Preview</button>
+  <button class="btn-preview" onclick="preview()">Preview</button>
 </div>
 
-<!-- PREVIEW BOX -->
 <div id="previewBox" class="preview"></div>
 
-<!-- SEND BUTTON BELOW PREVIEW -->
 <div class="btn-area">
-  <button id="sendBtn" class="btn-send" onclick="sendConfession()" style="display:none;">
-    Send
-  </button>
+  <button id="sendBtn" class="btn-send" onclick="send()" style="display:none;">Send</button>
 </div>
 
-<p id="status" class="status"></p>
+<div id="status" class="status"></div>
+
+</div>
 
 </div>
 
 <!-- CALM SCREEN -->
-<div class="calm-screen" id="calmScreen">
-  <div class="breath"></div>
+<div id="calm" class="calm">
+  <div class="circle"></div>
   <p>You did something important 💛</p>
 </div>
 
 <script>
 
-let selectedEmotion = "";
+let emotion = "";
 
 // emotion select
-document.querySelectorAll(".emotion").forEach(el => {
-  el.onclick = () => {
-    document.querySelectorAll(".emotion").forEach(e => e.classList.remove("active"));
-    el.classList.add("active");
-    selectedEmotion = el.innerText;
-  };
+document.querySelectorAll(".emotion").forEach(e=>{
+  e.onclick=()=>{
+    document.querySelectorAll(".emotion").forEach(x=>x.classList.remove("active"));
+    e.classList.add("active");
+    emotion=e.innerText;
+  }
 });
 
 // counter
-document.getElementById("confessionInput").addEventListener("input", function() {
-  document.getElementById("counter").innerText = this.value.length + " characters";
-});
+document.getElementById("input").oninput=function(){
+  document.getElementById("counter").innerText=this.value.length;
+};
 
 // preview
-function previewText(){
-  const input = document.getElementById("confessionInput").value.trim();
+function preview(){
+  let text=document.getElementById("input").value.trim();
 
-  if(input.length < 5){
-    showStatus("Write a bit more before previewing.");
+  if(text.length<5){
+    status("Write a bit more");
     return;
   }
 
-  const text = (selectedEmotion ? selectedEmotion + "\n\n" : "") + input;
+  let full=(emotion?emotion+"\n\n":"")+text;
 
   document.getElementById("previewBox").style.display="block";
-  document.getElementById("previewBox").innerText=text;
+  document.getElementById("previewBox").innerText=full;
 
   document.getElementById("sendBtn").style.display="inline-block";
 
-  showStatus("Preview ready. You can send now.");
+  status("Ready to send");
 }
 
 // send
-function sendConfession(){
+function send(){
 
-  const input = document.getElementById("confessionInput").value.trim();
+  let text=document.getElementById("input").value.trim();
 
-  if(input.length < 5){
-    showStatus("Message too short.");
+  if(text.length<5){
+    status("Message too short");
     return;
   }
 
-  const text = (selectedEmotion ? selectedEmotion + "\n\n" : "") + input;
+  let full=(emotion?emotion+"\n\n":"")+text;
 
-  // show success instantly
-  showStatus("Your message was sent to Admin. It will be shared anonymously within 24 hours.");
-
-  showCalmScreen();
+  status("Message sent anonymously ✔");
 
   // send silently
-  const formData = new FormData();
-  formData.append("message", text);
+  let fd=new FormData();
+  fd.append("message",full);
 
-  fetch("https://formspree.io/f/mjgalprd", {
-    method:"POST",
-    body:formData
-  });
+  fetch("https://formspree.io/f/mjgalprd",{method:"POST",body:fd});
 
   // reset
-  document.getElementById("confessionInput").value="";
+  document.getElementById("input").value="";
   document.getElementById("previewBox").style.display="none";
   document.getElementById("sendBtn").style.display="none";
-  document.getElementById("counter").innerText="0 characters";
+  document.getElementById("counter").innerText="0";
 
-  document.querySelectorAll(".emotion").forEach(e => e.classList.remove("active"));
-  selectedEmotion="";
+  document.querySelectorAll(".emotion").forEach(x=>x.classList.remove("active"));
+  emotion="";
+
+  showCalm();
 }
 
-// helper
-function showStatus(msg){
-  document.getElementById("status").innerText = msg;
+function status(msg){
+  document.getElementById("status").innerText=msg;
 }
 
-// calm screen
-function showCalmScreen(){
-  const screen = document.getElementById("calmScreen");
-  screen.style.display="flex";
+function showCalm(){
+  let c=document.getElementById("calm");
+  c.style.display="flex";
 
-  setTimeout(()=>{
-    screen.style.display="none";
-  },3000);
+  setTimeout(()=>{c.style.display="none";},3000);
 }
 
 </script>
