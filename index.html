@@ -1,335 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MindSpace | Confessions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Noto+Sans+Sinhala:wght@400;700&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --accent: #64748b;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #f8fafc;
+        }
 
-<title>Confession Wall</title>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            margin: 0; 
+            background-color: var(--bg-color);
+            color: var(--text);
+            font-family: 'Inter', 'Noto Sans Sinhala', sans-serif;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-<style>
+        /* Animated Background Orbs */
+        .orb {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.15;
+            transition: background 0.8s ease;
+        }
 
-body {
-  margin:0;
-  font-family:'Noto Sans Sinhala', sans-serif;
-  background:linear-gradient(135deg,#e8f5e9,#c8e6c9);
-  display:flex;
-  justify-content:center;
-  transition: background 0.6s ease;
-}
+        #app-shell {
+            width: 100%;
+            max-width: 420px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-.app {
-  width:100%;
-  max-width:420px;
-  min-height:100vh;
-  padding:15px;
-  position:relative;
-}
+        header { text-align: center; margin-bottom: 10px; }
+        header h1 { font-weight: 300; letter-spacing: 2px; margin: 0; font-size: 1.8rem; }
+        header p { opacity: 0.6; font-size: 0.8rem; margin-top: 5px; }
 
-.card {
-  backdrop-filter: blur(12px);
-  background: rgba(255,255,255,0.25);
-  border-radius:20px;
-  padding:15px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.15);
-}
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
 
-/* HEADER */
-.header {
-  text-align:center;
-}
+        .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5; margin-bottom: 15px; display: block; }
 
-.logo {
-  width:120px;
-  margin-bottom:5px;
-}
+        /* Emotion Selector */
+        .emotion-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
 
-.title {
-  font-size:15px;
-  font-weight:bold;
-}
+        .emotion-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 12px 5px;
+            border-radius: 18px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
 
-/* EMOTIONS */
-.emotions {
-  display:grid;
-  grid-template-columns: repeat(4,1fr);
-  gap:8px;
-}
+        .emotion-item span:first-child { font-size: 1.8rem; margin-bottom: 5px; }
+        .emotion-item span:last-child { font-size: 0.65rem; font-weight: 600; opacity: 0.7; }
 
-.emotion {
-  padding:10px;
-  border-radius:50%;
-  text-align:center;
-  cursor:pointer;
-  background:rgba(255,255,255,0.4);
-  font-size:20px;
-  transition:0.2s;
-}
+        .emotion-item.active {
+            background: rgba(255,255,255,0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
+            transform: translateY(-3px);
+        }
 
-.emotion.active {
-  background:white;
-  transform:scale(1.1);
-}
+        /* Input Area */
+        textarea {
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: none;
+            outline: none;
+            transition: border-color 0.3s;
+        }
 
-/* TEXT */
-textarea {
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:none;
-  margin-top:10px;
-  font-size:15px;
-  box-sizing:border-box;
-}
+        textarea:focus { border-color: var(--accent); }
 
-/* BUTTONS */
-.btn-area {
-  text-align:center;
-  margin-top:10px;
-}
+        /* Toggle Options */
+        .options-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            padding: 0 5px;
+        }
 
-button {
-  padding:8px 18px;
-  border:none;
-  border-radius:20px;
-  cursor:pointer;
-  font-size:14px;
-}
+        .switch-container { display: flex; gap: 10px; }
+        .toggle-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .toggle-btn.active {
+            background: var(--accent);
+            color: var(--bg-color);
+            font-weight: 600;
+        }
 
-.btn-preview {
-  background:#66bb6a;
-  color:white;
-}
+        /* Action Buttons */
+        .btn-send {
+            width: 100%;
+            padding: 18px;
+            border-radius: 20px;
+            border: none;
+            background: var(--accent);
+            color: var(--bg-color);
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
 
-.btn-send {
-  background:#1b5e20;
-  color:white;
-}
+        .btn-send:active { transform: scale(0.98); opacity: 0.9; }
+        .btn-send:disabled { opacity: 0.2; cursor: not-allowed; filter: grayscale(1); }
 
-/* PREVIEW */
-.preview {
-  display:none;
-  background:white;
-  padding:12px;
-  border-radius:12px;
-  margin-top:10px;
-  white-space:pre-wrap;
-}
-
-/* COMMENT */
-.comment-box {
-  display:none;
-  margin-top:10px;
-  font-size:13px;
-}
-
-/* CALM SCREEN */
-.calm {
-  display:none;
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  border-radius:20px;
-  background:rgba(27,94,32,0.95);
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  color:white;
-  text-align:center;
-}
-
-/* BOX BREATHING */
-.box {
-  width:120px;
-  height:120px;
-  border:3px solid #a5d6a7;
-  position:relative;
-  margin-bottom:20px;
-}
-
-.dot {
-  width:12px;
-  height:12px;
-  background:#a5d6a7;
-  border-radius:50%;
-  position:absolute;
-  animation: move 16s linear infinite;
-}
-
-@keyframes move {
-  0% { top:0; left:0;}
-  25% { top:0; left:108px;}
-  50% { top:108px; left:108px;}
-  75% { top:108px; left:0;}
-  100% { top:0; left:0;}
-}
-
-.breath-text {
-  font-size:16px;
-  margin-top:10px;
-}
-
-</style>
+        /* Success Overlay */
+        #success-msg {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-color);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            text-align: center;
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="app">
+    <div class="orb" id="orb-1" style="top: 10%; left: -10%; background: #3b82f6;"></div>
+    <div class="orb" id="orb-2" style="bottom: 10%; right: -10%; background: #a855f7;"></div>
 
-<div class="card">
+    <div id="app-shell">
+        <header>
+            <h1>MindSpace</h1>
+            <p>Share what's on your mind, safely.</p>
+        </header>
 
-<div class="header">
-  <img src="logo.png" class="logo">
-  <div class="title"> ✍️ Confession Wall</div>
-</div>
+        <div class="card">
+            <span class="label">Select your mood</span>
+            <div class="emotion-grid">
+                <div class="emotion-item" onclick="setMood('Happy', '#f59e0b', '#451a03')">
+                    <span>😊</span><span>Happy</span>
+                </div>
+                <div class="emotion-item" onclick="setMood('Sad', '#3b82f6', '#082f49')">
+                    <span>😢</span><span>Sad</span>
+                </div>
+                <div class="emotion-item" onclick="setMood('Angry', '#ef4444', '#450a0a')">
+                    <span>😠</span><span>Angry</span>
+                </div>
+                <div class="emotion-item" onclick="setMood('Calm', '#10b981', '#064e3b')">
+                    <span>😌</span><span>Calm</span>
+                </div>
+            </div>
 
-<p style="text-align:center;font-size:13px;">No names. No judgment. </p>
-<p style="text-align:center;font-size:13px;"> ඔබේ හිතට දැනෙන දේ කැමති භාෂාවකින් ලියන්න </p>
-<p>I feel...</p>
+            <span class="label">Your thoughts</span>
+            <textarea id="confession" rows="6" placeholder="Start typing..."></textarea>
 
-<div class="emotions">
-  <div class="emotion">😔</div>
-  <div class="emotion">😡</div>
-  <div class="emotion">😕</div>
-  <div class="emotion">😞</div>
-  <div class="emotion">😢</div>
-  <div class="emotion">😶</div>
-  <div class="emotion">😟</div>
-  <div class="emotion">😓</div>
-  <div class="emotion">😶‍🌫️</div>
-  <div class="emotion">😣</div>
-  <div class="emotion">😌</div>
-</div>
+            <div class="options-group">
+                <span style="font-size: 0.85rem; opacity: 0.7;">Allow comments?</span>
+                <div class="switch-container">
+                    <button id="opt-no" class="toggle-btn active" onclick="setComments('No')">No</button>
+                    <button id="opt-yes" class="toggle-btn" onclick="setComments('Yes')">Yes</button>
+                </div>
+            </div>
 
-<textarea id="input" rows="5" placeholder="Write your thoughts..."></textarea>
+            <button id="send-btn" class="btn-send" disabled onclick="handleSend()">Send Confession</button>
+        </div>
+    </div>
 
-<div class="btn-area">
-  <button class="btn-preview" onclick="preview()">Preview</button>
-</div>
+    <div id="success-msg">
+        <div style="font-size: 4rem;">✨</div>
+        <h2>Sent into the void</h2>
+        <p style="opacity: 0.6;">Your message has been received.</p>
+        <button class="toggle-btn" style="margin-top: 30px; padding: 15px 30px;" onclick="location.reload()">Write Another</button>
+    </div>
 
-<div id="previewBox" class="preview"></div>
+    <script>
+        let selectedMood = "";
+        let allowComments = "No";
 
-<div id="commentOption" class="comment-box">
-  <p>Allow comments?</p>
-  <label><input type="radio" name="comments" value="Yes"> Yes</label><br>
-  <label><input type="radio" name="comments" value="No" checked> No</label>
-</div>
+        function setMood(mood, color, darkColor) {
+            selectedMood = mood;
+            
+            // Update CSS Variables for Dynamic Theming
+            document.documentElement.style.setProperty('--accent', color);
+            document.documentElement.style.setProperty('--bg-color', darkColor);
+            
+            // Update Active Class
+            document.querySelectorAll('.emotion-item').forEach(el => {
+                el.classList.remove('active');
+                if(el.innerText.includes(mood)) el.classList.add('active');
+            });
 
-<div class="btn-area">
-  <button id="sendBtn" class="btn-send" onclick="send()" style="display:none;">Send</button>
-</div>
+            // Update Orbs
+            document.getElementById('orb-1').style.background = color;
+            
+            validate();
+        }
 
-</div>
+        function setComments(val) {
+            allowComments = val;
+            document.getElementById('opt-yes').classList.toggle('active', val === 'Yes');
+            document.getElementById('opt-no').classList.toggle('active', val === 'No');
+        }
 
-<!-- CALM SCREEN -->
-<div id="calm" class="calm">
-  <div class="box">
-    <div class="dot"></div>
-  </div>
-  <div class="breath-text" id="breathText">Breathe In</div>
-  <p style="font-size:13px;margin-top:10px;">
-    Your message will be shared anonymously within 24 hours.
-  </p>
-</div>
+        const textarea = document.getElementById('confession');
+        textarea.addEventListener('input', validate);
 
-</div>
+        function validate() {
+            const btn = document.getElementById('send-btn');
+            btn.disabled = !(selectedMood && textarea.value.trim().length > 3);
+        }
 
-<script>
+        function handleSend() {
+            const btn = document.getElementById('send-btn');
+            const text = textarea.value.trim();
+            btn.innerText = "Sending...";
+            
+            const formData = new FormData();
+            formData.append("Mood", selectedMood);
+            formData.append("Message", text);
+            formData.append("CommentsAllowed", allowComments);
 
-let emotion="";
-
-// emotion colors
-document.querySelectorAll(".emotion").forEach(e=>{
-  e.onclick=()=>{
-    document.querySelectorAll(".emotion").forEach(x=>x.classList.remove("active"));
-    e.classList.add("active");
-
-    emotion=e.innerText;
-
-    let bg="linear-gradient(135deg,#e8f5e9,#c8e6c9)";
-
-    switch(emotion){
-      case "😡": bg="linear-gradient(135deg,#ffcdd2,#ef9a9a)"; break;
-      case "😔": bg="linear-gradient(135deg,#bbdefb,#90caf9)"; break;
-      case "😢": bg="linear-gradient(135deg,#90caf9,#64b5f6)"; break;
-      case "😟": bg="linear-gradient(135deg,#e1bee7,#ce93d8)"; break;
-      case "😶": bg="linear-gradient(135deg,#e0e0e0,#bdbdbd)"; break;
-      case "😣": bg="linear-gradient(135deg,#ffe0b2,#ffb74d)"; break;
-      case "😌": bg="linear-gradient(135deg,#c8e6c9,#a5d6a7)"; break;
-    }
-
-    document.body.style.background=bg;
-  }
-});
-
-// preview
-function preview(){
-  let text=document.getElementById("input").value.trim();
-  if(text.length<5){ alert("Write more"); return; }
-
-  let full=(emotion?emotion+"\n\n":"")+text;
-
-  document.getElementById("previewBox").style.display="block";
-  document.getElementById("previewBox").innerText=full;
-
-  document.getElementById("sendBtn").style.display="inline-block";
-  document.getElementById("commentOption").style.display="block";
-}
-
-// send
-function send(){
-
-  let text=document.getElementById("input").value.trim();
-  let comment=document.querySelector('input[name="comments"]:checked').value;
-
-  let full=(emotion?emotion+"\n\n":"")+text+"\n\nAllow comments: "+comment;
-
-  let fd=new FormData();
-  fd.append("message",full);
-
-  fetch("https://formspree.io/f/mjgalprd",{method:"POST",body:fd});
-
-  showCalm();
-  reset();
-}
-
-// reset
-function reset(){
-  document.getElementById("input").value="";
-  document.getElementById("previewBox").style.display="none";
-  document.getElementById("sendBtn").style.display="none";
-  document.getElementById("commentOption").style.display="none";
-  document.querySelectorAll(".emotion").forEach(x=>x.classList.remove("active"));
-  emotion="";
-}
-
-// breathing text cycle
-let phases=["Breathe In","Hold","Breathe Out","Hold"];
-let i=0;
-
-setInterval(()=>{
-  document.getElementById("breathText").innerText=phases[i%4];
-  i++;
-},4000);
-
-// calm screen
-function showCalm(){
-  let c=document.getElementById("calm");
-
-  // reset breathing cycle
-  i = 0;
-
-  c.style.display="flex";
-
-  setTimeout(()=>{
-    c.style.display="none";
-  },16000);
-}
-
-</script>
-
+            fetch("https://formspree.io/f/mjgalprd", {
+                method: "POST",
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            }).then(() => {
+                document.getElementById('success-msg').style.display = 'flex';
+            }).catch(() => {
+                alert("Failed to send. Please try again.");
+                btn.innerText = "Send Confession";
+            });
+        }
+    </script>
 </body>
 </html>
