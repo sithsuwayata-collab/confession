@@ -257,26 +257,37 @@
             btn.disabled = !(selectedMood && textarea.value.trim().length > 3);
         }
 
-        function handleSend() {
-            const btn = document.getElementById('send-btn');
-            const text = textarea.value.trim();
-            btn.innerText = "Sending...";
-            
-            const formData = new FormData();
-            formData.append("Mood", selectedMood);
-            formData.append("Message", text);
-            formData.append("CommentsAllowed", allowComments);
+         function handleSend() {
+    const btn = document.getElementById('send-btn');
+    const text = textarea.value.trim();
+    btn.innerText = "Sending...";
+    
+    // Your specific Google Form endpoint
+    const googleFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeAjECgMa-xcpy0LrZLWwW9GLmk6e7KStAdCm7qBFslchRHnA/formResponse";
+    
+    const formData = new FormData();
+    
+    // Mapping your IDs from the provided link
+    formData.append("entry.1714490811", selectedMood);   // Mood field
+    formData.append("entry.1532578280", text);           // Message field
+    formData.append("entry.2052317827", allowComments);  // CommentsAllowed field
 
-            fetch("https://formspree.io/f/mjgalprd", {
-                method: "POST",
-                body: formData,
-                headers: { 'Accept': 'application/json' }
-            }).then(() => {
-                document.getElementById('success-msg').style.display = 'flex';
-            }).catch(() => {
-                alert("Failed to send. Please try again.");
-                btn.innerText = "Send Confession";
-            });
+    // Sending to Google
+    fetch(googleFormUrl, {
+        method: "POST",
+        mode: "no-cors", // Essential for Google Forms
+        body: formData
+    }).then(() => {
+        // Since we use no-cors, we show success immediately after the request fires
+        document.getElementById('success-msg').style.display = 'flex';
+        // Optional: clear the textarea for next time
+        textarea.value = "";
+    }).catch((error) => {
+        console.error("Submission Error:", error);
+        alert("Failed to reach Google Forms. Check your internet connection.");
+        btn.innerText = "Send Confession";
+    });
+}
         }
     </script>
 </body>
