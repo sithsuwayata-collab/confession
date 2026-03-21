@@ -10,7 +10,6 @@
 
 <style>
 
-/* BACKGROUND */
 body {
   margin:0;
   font-family:'Noto Sans Sinhala', sans-serif;
@@ -19,26 +18,21 @@ body {
   justify-content:center;
 }
 
-/* APP FRAME */
+/* APP */
 .app {
   width:100%;
   max-width:420px;
   min-height:100vh;
   background:#1b5e20;
   color:white;
-  display:flex;
-  flex-direction:column;
 }
 
 /* HEADER */
 .header {
   padding:15px;
   text-align:center;
-  font-size:18px;
   font-weight:bold;
   background:#144d18;
-  position:sticky;
-  top:0;
 }
 
 /* CONTENT */
@@ -48,17 +42,17 @@ body {
 
 /* EMOTIONS */
 .emotions {
-  display:flex;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
   gap:8px;
-  margin-bottom:10px;
 }
 
 .emotion {
-  padding:6px 10px;
+  padding:6px;
   border-radius:20px;
   background:#43a047;
   font-size:12px;
+  text-align:center;
   cursor:pointer;
 }
 
@@ -68,24 +62,22 @@ body {
   font-weight:bold;
 }
 
-/* TEXT AREA */
+/* TEXTAREA */
 textarea {
   width:100%;
-  box-sizing:border-box;
   padding:12px;
   border-radius:12px;
   border:none;
   font-size:15px;
   color:#1b5e20;
-  line-height:24px;
-  resize:none;
+  margin-top:10px;
+  box-sizing:border-box;
 }
 
 /* COUNTER */
 .counter {
-  text-align:right;
   font-size:11px;
-  margin-top:4px;
+  text-align:right;
   color:#c8e6c9;
 }
 
@@ -114,8 +106,14 @@ button {
   padding:12px;
   border-radius:12px;
   margin-top:10px;
-  font-size:14px;
   white-space:pre-wrap;
+}
+
+/* COMMENT OPTION */
+.comment-box {
+  display:none;
+  margin-top:10px;
+  font-size:13px;
 }
 
 /* STATUS */
@@ -126,7 +124,7 @@ button {
   color:#c8e6c9;
 }
 
-/* CALM SCREEN */
+/* CALM */
 .calm {
   display:none;
   position:fixed;
@@ -145,7 +143,7 @@ button {
   height:80px;
   border-radius:50%;
   background:#a5d6a7;
-  animation: breathe 4s infinite;
+  animation:breathe 4s infinite;
 }
 
 @keyframes breathe {
@@ -161,20 +159,15 @@ button {
 
 <div class="app">
 
-<div class="header"> ✍️ Confession Wall🌿</div>
+<div class="header">🌿 Confession Wall</div>
 
 <div class="content">
 
 <p style="font-size:13px;color:#c8e6c9;text-align:center;">
-No names. No judgment.කැමති භාෂාවකින් ලියන්න.
+No names. No judgment.
 </p>
 
-<!-- EMOTIONS -->
-  
-
-<p style="margin-top:10px; font-size:14px; color:#c8e6c9;">
-  I feel...
-</p>
+<p style="margin-top:10px;">I feel...</p>
 
 <div class="emotions">
   <div class="emotion">😔 Sad</div>
@@ -201,6 +194,13 @@ No names. No judgment.කැමති භාෂාවකින් ලියන�
 
 <div id="previewBox" class="preview"></div>
 
+<!-- COMMENT OPTION -->
+<div id="commentOption" class="comment-box">
+  <p>Allow comments from group members?</p>
+  <label><input type="radio" name="comments" value="Yes"> Yes</label><br>
+  <label><input type="radio" name="comments" value="No" checked> No</label>
+</div>
+
 <div class="btn-area">
   <button id="sendBtn" class="btn-send" onclick="send()" style="display:none;">Send</button>
 </div>
@@ -211,15 +211,15 @@ No names. No judgment.කැමති භාෂාවකින් ලියන�
 
 </div>
 
-<!-- CALM SCREEN -->
+<!-- CALM -->
 <div id="calm" class="calm">
   <div class="circle"></div>
-  <p>You did something important 💛</p>
+  <p>Your message has been sent 💛</p>
 </div>
 
 <script>
 
-let emotion = "";
+let emotion="";
 
 // emotion select
 document.querySelectorAll(".emotion").forEach(e=>{
@@ -240,7 +240,7 @@ function preview(){
   let text=document.getElementById("input").value.trim();
 
   if(text.length<5){
-    status("Write a bit more");
+    status("Write a bit more before previewing.");
     return;
   }
 
@@ -250,46 +250,49 @@ function preview(){
   document.getElementById("previewBox").innerText=full;
 
   document.getElementById("sendBtn").style.display="inline-block";
+  document.getElementById("commentOption").style.display="block";
 
-  status("Ready to send");
+  status("Preview ready. You can send now.");
 }
 
 // send
 function send(){
 
   let text=document.getElementById("input").value.trim();
+  let commentChoice=document.querySelector('input[name="comments"]:checked').value;
 
-  if(text.length<5){
-    status("Message too short");
-    return;
-  }
+  let full=(emotion?emotion+"\n\n":"")+text +
+  "\n\nAllow comments: " + commentChoice;
 
-  let full=(emotion?emotion+"\n\n":"")+text;
+  status("Your message will be posted anonymously within 24 hours.");
 
-  status("Your message has been sent. It will be shared anonymously in the group within 24 hours.");
-
-  // send silently
   let fd=new FormData();
   fd.append("message",full);
 
   fetch("https://formspree.io/f/mjgalprd",{method:"POST",body:fd});
 
-  // reset
+  reset();
+  showCalm();
+}
+
+// reset
+function reset(){
   document.getElementById("input").value="";
   document.getElementById("previewBox").style.display="none";
   document.getElementById("sendBtn").style.display="none";
+  document.getElementById("commentOption").style.display="none";
   document.getElementById("counter").innerText="0";
 
   document.querySelectorAll(".emotion").forEach(x=>x.classList.remove("active"));
   emotion="";
-
-  showCalm();
 }
 
+// status
 function status(msg){
   document.getElementById("status").innerText=msg;
 }
 
+// calm
 function showCalm(){
   let c=document.getElementById("calm");
   c.style.display="flex";
