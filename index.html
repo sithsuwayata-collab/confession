@@ -13,7 +13,7 @@
 body {
   margin:0;
   font-family:'Noto Sans Sinhala', sans-serif;
-  background:#dcedc8;
+  background:linear-gradient(135deg,#e8f5e9,#c8e6c9);
   display:flex;
   justify-content:center;
 }
@@ -23,62 +23,70 @@ body {
   width:100%;
   max-width:420px;
   min-height:100vh;
-  background:#1b5e20;
-  color:white;
+  padding:15px;
+}
+
+/* GLASS CARD */
+.card {
+  backdrop-filter: blur(12px);
+  background: rgba(255,255,255,0.2);
+  border-radius:20px;
+  padding:15px;
+  margin-top:10px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.15);
 }
 
 /* HEADER */
 .header {
-  padding:15px;
   text-align:center;
-  font-weight:bold;
-  background:#144d18;
 }
 
-/* CONTENT */
-.content {
-  padding:15px;
+.logo {
+  width:130px;
+  display:block;
+  margin:0 auto 5px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+}
+
+.title {
+  font-size:16px;
+  font-weight:bold;
 }
 
 /* EMOTIONS */
 .emotions {
   display:grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3,1fr);
   gap:8px;
 }
 
 .emotion {
-  padding:6px;
+  padding:8px;
   border-radius:20px;
-  background:#43a047;
-  font-size:12px;
   text-align:center;
   cursor:pointer;
+  background:rgba(255,255,255,0.3);
+  transition:0.2s;
+}
+
+.emotion:hover {
+  transform:scale(1.05);
 }
 
 .emotion.active {
-  background:#a5d6a7;
-  color:#1b5e20;
+  background:white;
   font-weight:bold;
 }
 
-/* TEXTAREA */
+/* TEXT */
 textarea {
   width:100%;
   padding:12px;
   border-radius:12px;
   border:none;
-  font-size:15px;
-  color:#1b5e20;
   margin-top:10px;
+  font-size:15px;
   box-sizing:border-box;
-}
-
-/* COUNTER */
-.counter {
-  font-size:11px;
-  text-align:right;
-  color:#c8e6c9;
 }
 
 /* BUTTONS */
@@ -91,25 +99,31 @@ button {
   padding:8px 18px;
   border:none;
   border-radius:20px;
-  font-size:13px;
   cursor:pointer;
+  font-size:14px;
 }
 
-.btn-preview { background:#43a047; color:white; }
-.btn-send { background:#0d3b12; color:white; }
+.btn-preview {
+  background:#66bb6a;
+  color:white;
+}
+
+.btn-send {
+  background:#1b5e20;
+  color:white;
+}
 
 /* PREVIEW */
 .preview {
   display:none;
   background:white;
-  color:#1b5e20;
   padding:12px;
   border-radius:12px;
   margin-top:10px;
   white-space:pre-wrap;
 }
 
-/* COMMENT OPTION */
+/* COMMENT */
 .comment-box {
   display:none;
   margin-top:10px;
@@ -119,9 +133,16 @@ button {
 /* STATUS */
 .status {
   margin-top:10px;
-  font-size:13px;
   text-align:center;
-  color:#c8e6c9;
+  font-size:13px;
+}
+
+/* EMOTION MESSAGE */
+.feedback {
+  text-align:center;
+  font-size:13px;
+  margin-top:8px;
+  color:#2e7d32;
 }
 
 /* CALM */
@@ -132,10 +153,11 @@ button {
   left:0;
   width:100%;
   height:100%;
-  background:#1b5e20;
+  background:rgba(27,94,32,0.9);
   justify-content:center;
   align-items:center;
   flex-direction:column;
+  color:white;
 }
 
 .circle {
@@ -147,9 +169,9 @@ button {
 }
 
 @keyframes breathe {
-  0% { transform:scale(1); }
-  50% { transform:scale(1.5); }
-  100% { transform:scale(1); }
+  0% {transform:scale(1);}
+  50% {transform:scale(1.5);}
+  100% {transform:scale(1);}
 }
 
 </style>
@@ -159,15 +181,19 @@ button {
 
 <div class="app">
 
-<div class="header">🌿 Confession Wall</div>
+<div class="card">
 
-<div class="content">
+<!-- HEADER WITH LOGO -->
+<div class="header">
+  <img src="logo.png" alt="Logo" class="logo">
+  <div class="title">Confession Wall</div>
+</div>
 
-<p style="font-size:13px;color:#c8e6c9;text-align:center;">
+<p style="text-align:center;font-size:13px;">
 No names. No judgment.
 </p>
 
-<p style="margin-top:10px;">I feel...</p>
+<p>I feel...</p>
 
 <div class="emotions">
   <div class="emotion">😔 Sad</div>
@@ -184,9 +210,9 @@ No names. No judgment.
   <div class="emotion">😌 Relieved</div>
 </div>
 
-<textarea id="input" rows="5" placeholder="Write your thoughts..."></textarea>
+<div id="emotionMsg" class="feedback"></div>
 
-<div class="counter" id="counter">0</div>
+<textarea id="input" rows="5" placeholder="Write your thoughts..."></textarea>
 
 <div class="btn-area">
   <button class="btn-preview" onclick="preview()">Preview</button>
@@ -211,15 +237,23 @@ No names. No judgment.
 
 </div>
 
-<!-- CALM -->
+<!-- CALM SCREEN -->
 <div id="calm" class="calm">
   <div class="circle"></div>
-  <p>Your message has been sent 💛</p>
+  <p>Take a breath. This feeling will pass.</p>
 </div>
 
 <script>
 
 let emotion="";
+
+// supportive messages
+const messages=[
+"Take a breath. This feeling will pass.",
+"You are not alone in this.",
+"This moment does not define you.",
+"Feelings change, even if they feel strong now."
+];
 
 // emotion select
 document.querySelectorAll(".emotion").forEach(e=>{
@@ -227,20 +261,21 @@ document.querySelectorAll(".emotion").forEach(e=>{
     document.querySelectorAll(".emotion").forEach(x=>x.classList.remove("active"));
     e.classList.add("active");
     emotion=e.innerText;
-  }
-});
 
-// counter
-document.getElementById("input").oninput=function(){
-  document.getElementById("counter").innerText=this.value.length;
-};
+    document.getElementById("emotionMsg").innerText =
+    messages[Math.floor(Math.random()*messages.length)];
+
+    document.body.style.background =
+    "linear-gradient(135deg,#e8f5e9,#a5d6a7)";
+  };
+});
 
 // preview
 function preview(){
   let text=document.getElementById("input").value.trim();
 
   if(text.length<5){
-    status("Write a bit more before previewing.");
+    status("Write a bit more.");
     return;
   }
 
@@ -252,19 +287,18 @@ function preview(){
   document.getElementById("sendBtn").style.display="inline-block";
   document.getElementById("commentOption").style.display="block";
 
-  status("Preview ready. You can send now.");
+  status("Preview ready.");
 }
 
 // send
 function send(){
 
   let text=document.getElementById("input").value.trim();
-  let commentChoice=document.querySelector('input[name="comments"]:checked').value;
+  let comment=document.querySelector('input[name="comments"]:checked').value;
 
-  let full=(emotion?emotion+"\n\n":"")+text +
-  "\n\nAllow comments: " + commentChoice;
+  let full=(emotion?emotion+"\n\n":"")+text+"\n\nAllow comments: "+comment;
 
-  status("Your message will be posted anonymously within 24 hours.");
+  status("Your message will be shared anonymously within 24 hours.");
 
   let fd=new FormData();
   fd.append("message",full);
@@ -281,22 +315,20 @@ function reset(){
   document.getElementById("previewBox").style.display="none";
   document.getElementById("sendBtn").style.display="none";
   document.getElementById("commentOption").style.display="none";
-  document.getElementById("counter").innerText="0";
+  document.getElementById("emotionMsg").innerText="";
 
   document.querySelectorAll(".emotion").forEach(x=>x.classList.remove("active"));
   emotion="";
 }
 
-// status
+// helpers
 function status(msg){
   document.getElementById("status").innerText=msg;
 }
 
-// calm
 function showCalm(){
   let c=document.getElementById("calm");
   c.style.display="flex";
-
   setTimeout(()=>{c.style.display="none";},3000);
 }
 
