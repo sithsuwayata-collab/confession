@@ -12,11 +12,11 @@
 
 body {
   margin:0;
-  transition: background 0.6s ease;
   font-family:'Noto Sans Sinhala', sans-serif;
   background:linear-gradient(135deg,#e8f5e9,#c8e6c9);
   display:flex;
   justify-content:center;
+  transition: background 0.6s ease;
 }
 
 .app {
@@ -24,11 +24,12 @@ body {
   max-width:420px;
   min-height:100vh;
   padding:15px;
+  position:relative;
 }
 
 .card {
   backdrop-filter: blur(12px);
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.25);
   border-radius:20px;
   padding:15px;
   box-shadow:0 8px 25px rgba(0,0,0,0.15);
@@ -41,8 +42,7 @@ body {
 
 .logo {
   width:120px;
-  display:block;
-  margin:0 auto 5px;
+  margin-bottom:5px;
 }
 
 .title {
@@ -62,7 +62,7 @@ body {
   border-radius:50%;
   text-align:center;
   cursor:pointer;
-  background:rgba(255,255,255,0.3);
+  background:rgba(255,255,255,0.4);
   font-size:20px;
   transition:0.2s;
 }
@@ -127,33 +127,49 @@ button {
 /* CALM SCREEN */
 .calm {
   display:none;
-  position:fixed;
+  position:absolute;
   top:0;
   left:0;
   width:100%;
   height:100%;
+  border-radius:20px;
   background:rgba(27,94,32,0.95);
   justify-content:center;
   align-items:center;
   flex-direction:column;
   color:white;
   text-align:center;
-  padding:20px;
 }
 
-.circle {
-  width:90px;
-  height:90px;
-  border-radius:50%;
+/* BOX BREATHING */
+.box {
+  width:120px;
+  height:120px;
+  border:3px solid #a5d6a7;
+  position:relative;
+  margin-bottom:20px;
+}
+
+.dot {
+  width:12px;
+  height:12px;
   background:#a5d6a7;
-  animation:breathe 4s infinite;
-  margin-bottom:15px;
+  border-radius:50%;
+  position:absolute;
+  animation: move 16s linear infinite;
 }
 
-@keyframes breathe {
-  0% {transform:scale(1);}
-  50% {transform:scale(1.5);}
-  100% {transform:scale(1);}
+@keyframes move {
+  0% { top:0; left:0;}
+  25% { top:0; left:108px;}
+  50% { top:108px; left:108px;}
+  75% { top:108px; left:0;}
+  100% { top:0; left:0;}
+}
+
+.breath-text {
+  font-size:16px;
+  margin-top:10px;
 }
 
 </style>
@@ -170,13 +186,10 @@ button {
   <div class="title">Confession Wall</div>
 </div>
 
-<p style="text-align:center;font-size:13px;">
-No names. No judgment.
-</p>
+<p style="text-align:center;font-size:13px;">No names. No judgment.</p>
 
 <p>I feel...</p>
 
-<!-- EMOJIS ONLY -->
 <div class="emotions">
   <div class="emotion">😔</div>
   <div class="emotion">😡</div>
@@ -186,7 +199,6 @@ No names. No judgment.
   <div class="emotion">😶</div>
   <div class="emotion">😟</div>
   <div class="emotion">😓</div>
-  <div class="emotion">😔</div>
   <div class="emotion">😶‍🌫️</div>
   <div class="emotion">😣</div>
   <div class="emotion">😌</div>
@@ -212,67 +224,51 @@ No names. No judgment.
 
 </div>
 
-</div>
-
 <!-- CALM SCREEN -->
 <div id="calm" class="calm">
-  <div class="circle"></div>
-  <p>Your message will be shared anonymously within 24 hours.</p>
+  <div class="box">
+    <div class="dot"></div>
+  </div>
+  <div class="breath-text" id="breathText">Breathe In</div>
+  <p style="font-size:13px;margin-top:10px;">
+    Your message will be shared anonymously within 24 hours.
+  </p>
+</div>
+
 </div>
 
 <script>
 
 let emotion="";
 
-// select emoji
+// emotion colors
 document.querySelectorAll(".emotion").forEach(e=>{
   e.onclick=()=>{
     document.querySelectorAll(".emotion").forEach(x=>x.classList.remove("active"));
     e.classList.add("active");
 
-    emotion = e.innerText;
+    emotion=e.innerText;
 
-    // 🎨 change background based on emotion
-    let bg = "#e8f5e9"; // default
+    let bg="linear-gradient(135deg,#e8f5e9,#c8e6c9)";
 
     switch(emotion){
-      case "😡":
-        bg = "linear-gradient(135deg,#ffcdd2,#ef9a9a)";
-        break;
-      case "😔":
-        bg = "linear-gradient(135deg,#bbdefb,#90caf9)";
-        break;
-      case "😢":
-        bg = "linear-gradient(135deg,#90caf9,#64b5f6)";
-        break;
-      case "😟":
-        bg = "linear-gradient(135deg,#e1bee7,#ce93d8)";
-        break;
-      case "😶":
-        bg = "linear-gradient(135deg,#e0e0e0,#bdbdbd)";
-        break;
-      case "😣":
-        bg = "linear-gradient(135deg,#ffe0b2,#ffb74d)";
-        break;
-      case "😌":
-        bg = "linear-gradient(135deg,#c8e6c9,#a5d6a7)";
-        break;
-      default:
-        bg = "linear-gradient(135deg,#e8f5e9,#c8e6c9)";
+      case "😡": bg="linear-gradient(135deg,#ffcdd2,#ef9a9a)"; break;
+      case "😔": bg="linear-gradient(135deg,#bbdefb,#90caf9)"; break;
+      case "😢": bg="linear-gradient(135deg,#90caf9,#64b5f6)"; break;
+      case "😟": bg="linear-gradient(135deg,#e1bee7,#ce93d8)"; break;
+      case "😶": bg="linear-gradient(135deg,#e0e0e0,#bdbdbd)"; break;
+      case "😣": bg="linear-gradient(135deg,#ffe0b2,#ffb74d)"; break;
+      case "😌": bg="linear-gradient(135deg,#c8e6c9,#a5d6a7)"; break;
     }
 
-    document.body.style.background = bg;
-  };
+    document.body.style.background=bg;
+  }
 });
 
 // preview
 function preview(){
   let text=document.getElementById("input").value.trim();
-
-  if(text.length<5){
-    alert("Write a bit more.");
-    return;
-  }
+  if(text.length<5){ alert("Write more"); return; }
 
   let full=(emotion?emotion+"\n\n":"")+text;
 
@@ -306,19 +302,27 @@ function reset(){
   document.getElementById("previewBox").style.display="none";
   document.getElementById("sendBtn").style.display="none";
   document.getElementById("commentOption").style.display="none";
-
   document.querySelectorAll(".emotion").forEach(x=>x.classList.remove("active"));
   emotion="";
 }
 
-// calm
+// breathing text cycle
+let phases=["Breathe In","Hold","Breathe Out","Hold"];
+let i=0;
+
+setInterval(()=>{
+  document.getElementById("breathText").innerText=phases[i%4];
+  i++;
+},4000);
+
+// calm screen
 function showCalm(){
   let c=document.getElementById("calm");
   c.style.display="flex";
 
   setTimeout(()=>{
     c.style.display="none";
-  },3000);
+  },8000);
 }
 
 </script>
