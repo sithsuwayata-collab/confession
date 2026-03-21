@@ -318,11 +318,15 @@ setInterval(()=>{
 // calm screen
 function showCalm(){
   let c=document.getElementById("calm");
+
+  // reset breathing cycle
+  i = 0;
+
   c.style.display="flex";
 
   setTimeout(()=>{
     c.style.display="none";
-  },8000);
+  },16000);
 }
 
 </script>
