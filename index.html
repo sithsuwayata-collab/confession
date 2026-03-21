@@ -12,6 +12,7 @@
 
 body {
   margin:0;
+  transition: background 0.6s ease;
   font-family:'Noto Sans Sinhala', sans-serif;
   background:linear-gradient(135deg,#e8f5e9,#c8e6c9);
   display:flex;
@@ -228,8 +229,40 @@ document.querySelectorAll(".emotion").forEach(e=>{
   e.onclick=()=>{
     document.querySelectorAll(".emotion").forEach(x=>x.classList.remove("active"));
     e.classList.add("active");
-    emotion=e.innerText;
-  }
+
+    emotion = e.innerText;
+
+    // 🎨 change background based on emotion
+    let bg = "#e8f5e9"; // default
+
+    switch(emotion){
+      case "😡":
+        bg = "linear-gradient(135deg,#ffcdd2,#ef9a9a)";
+        break;
+      case "😔":
+        bg = "linear-gradient(135deg,#bbdefb,#90caf9)";
+        break;
+      case "😢":
+        bg = "linear-gradient(135deg,#90caf9,#64b5f6)";
+        break;
+      case "😟":
+        bg = "linear-gradient(135deg,#e1bee7,#ce93d8)";
+        break;
+      case "😶":
+        bg = "linear-gradient(135deg,#e0e0e0,#bdbdbd)";
+        break;
+      case "😣":
+        bg = "linear-gradient(135deg,#ffe0b2,#ffb74d)";
+        break;
+      case "😌":
+        bg = "linear-gradient(135deg,#c8e6c9,#a5d6a7)";
+        break;
+      default:
+        bg = "linear-gradient(135deg,#e8f5e9,#c8e6c9)";
+    }
+
+    document.body.style.background = bg;
+  };
 });
 
 // preview
