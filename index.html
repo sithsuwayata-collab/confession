@@ -18,7 +18,6 @@ body {
   justify-content:center;
 }
 
-/* APP */
 .app {
   width:100%;
   max-width:420px;
@@ -26,13 +25,11 @@ body {
   padding:15px;
 }
 
-/* GLASS CARD */
 .card {
   backdrop-filter: blur(12px);
   background: rgba(255,255,255,0.2);
   border-radius:20px;
   padding:15px;
-  margin-top:10px;
   box-shadow:0 8px 25px rgba(0,0,0,0.15);
 }
 
@@ -42,40 +39,36 @@ body {
 }
 
 .logo {
-  width:130px;
+  width:120px;
   display:block;
   margin:0 auto 5px;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
 }
 
 .title {
-  font-size:16px;
+  font-size:15px;
   font-weight:bold;
 }
 
 /* EMOTIONS */
 .emotions {
   display:grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(4,1fr);
   gap:8px;
 }
 
 .emotion {
-  padding:8px;
-  border-radius:20px;
+  padding:10px;
+  border-radius:50%;
   text-align:center;
   cursor:pointer;
   background:rgba(255,255,255,0.3);
+  font-size:20px;
   transition:0.2s;
-}
-
-.emotion:hover {
-  transform:scale(1.05);
 }
 
 .emotion.active {
   background:white;
-  font-weight:bold;
+  transform:scale(1.1);
 }
 
 /* TEXT */
@@ -130,22 +123,7 @@ button {
   font-size:13px;
 }
 
-/* STATUS */
-.status {
-  margin-top:10px;
-  text-align:center;
-  font-size:13px;
-}
-
-/* EMOTION MESSAGE */
-.feedback {
-  text-align:center;
-  font-size:13px;
-  margin-top:8px;
-  color:#2e7d32;
-}
-
-/* CALM */
+/* CALM SCREEN */
 .calm {
   display:none;
   position:fixed;
@@ -153,19 +131,22 @@ button {
   left:0;
   width:100%;
   height:100%;
-  background:rgba(27,94,32,0.9);
+  background:rgba(27,94,32,0.95);
   justify-content:center;
   align-items:center;
   flex-direction:column;
   color:white;
+  text-align:center;
+  padding:20px;
 }
 
 .circle {
-  width:80px;
-  height:80px;
+  width:90px;
+  height:90px;
   border-radius:50%;
   background:#a5d6a7;
   animation:breathe 4s infinite;
+  margin-bottom:15px;
 }
 
 @keyframes breathe {
@@ -183,9 +164,8 @@ button {
 
 <div class="card">
 
-<!-- HEADER WITH LOGO -->
 <div class="header">
-  <img src="logo.png" alt="Logo" class="logo">
+  <img src="logo.png" class="logo">
   <div class="title">Confession Wall</div>
 </div>
 
@@ -195,22 +175,21 @@ No names. No judgment.
 
 <p>I feel...</p>
 
+<!-- EMOJIS ONLY -->
 <div class="emotions">
-  <div class="emotion">😔 Sad</div>
-  <div class="emotion">😡 Angry</div>
-  <div class="emotion">😕 Confused</div>
-  <div class="emotion">😞 Tired</div>
-  <div class="emotion">😢 Hurt</div>
-  <div class="emotion">😶 Empty</div>
-  <div class="emotion">😟 Worried</div>
-  <div class="emotion">😓 Overwhelmed</div>
-  <div class="emotion">😔 Lonely</div>
-  <div class="emotion">😶‍🌫️ Numb</div>
-  <div class="emotion">😣 Stressed</div>
-  <div class="emotion">😌 Relieved</div>
+  <div class="emotion">😔</div>
+  <div class="emotion">😡</div>
+  <div class="emotion">😕</div>
+  <div class="emotion">😞</div>
+  <div class="emotion">😢</div>
+  <div class="emotion">😶</div>
+  <div class="emotion">😟</div>
+  <div class="emotion">😓</div>
+  <div class="emotion">😔</div>
+  <div class="emotion">😶‍🌫️</div>
+  <div class="emotion">😣</div>
+  <div class="emotion">😌</div>
 </div>
-
-<div id="emotionMsg" class="feedback"></div>
 
 <textarea id="input" rows="5" placeholder="Write your thoughts..."></textarea>
 
@@ -220,9 +199,8 @@ No names. No judgment.
 
 <div id="previewBox" class="preview"></div>
 
-<!-- COMMENT OPTION -->
 <div id="commentOption" class="comment-box">
-  <p>Allow comments from group members?</p>
+  <p>Allow comments?</p>
   <label><input type="radio" name="comments" value="Yes"> Yes</label><br>
   <label><input type="radio" name="comments" value="No" checked> No</label>
 </div>
@@ -231,8 +209,6 @@ No names. No judgment.
   <button id="sendBtn" class="btn-send" onclick="send()" style="display:none;">Send</button>
 </div>
 
-<div id="status" class="status"></div>
-
 </div>
 
 </div>
@@ -240,34 +216,20 @@ No names. No judgment.
 <!-- CALM SCREEN -->
 <div id="calm" class="calm">
   <div class="circle"></div>
-  <p>Take a breath. This feeling will pass.</p>
+  <p>Your message will be shared anonymously within 24 hours.</p>
 </div>
 
 <script>
 
 let emotion="";
 
-// supportive messages
-const messages=[
-"Take a breath. This feeling will pass.",
-"You are not alone in this.",
-"This moment does not define you.",
-"Feelings change, even if they feel strong now."
-];
-
-// emotion select
+// select emoji
 document.querySelectorAll(".emotion").forEach(e=>{
   e.onclick=()=>{
     document.querySelectorAll(".emotion").forEach(x=>x.classList.remove("active"));
     e.classList.add("active");
     emotion=e.innerText;
-
-    document.getElementById("emotionMsg").innerText =
-    messages[Math.floor(Math.random()*messages.length)];
-
-    document.body.style.background =
-    "linear-gradient(135deg,#e8f5e9,#a5d6a7)";
-  };
+  }
 });
 
 // preview
@@ -275,7 +237,7 @@ function preview(){
   let text=document.getElementById("input").value.trim();
 
   if(text.length<5){
-    status("Write a bit more.");
+    alert("Write a bit more.");
     return;
   }
 
@@ -286,8 +248,6 @@ function preview(){
 
   document.getElementById("sendBtn").style.display="inline-block";
   document.getElementById("commentOption").style.display="block";
-
-  status("Preview ready.");
 }
 
 // send
@@ -298,15 +258,13 @@ function send(){
 
   let full=(emotion?emotion+"\n\n":"")+text+"\n\nAllow comments: "+comment;
 
-  status("Your message will be shared anonymously within 24 hours.");
-
   let fd=new FormData();
   fd.append("message",full);
 
   fetch("https://formspree.io/f/mjgalprd",{method:"POST",body:fd});
 
-  reset();
   showCalm();
+  reset();
 }
 
 // reset
@@ -315,21 +273,19 @@ function reset(){
   document.getElementById("previewBox").style.display="none";
   document.getElementById("sendBtn").style.display="none";
   document.getElementById("commentOption").style.display="none";
-  document.getElementById("emotionMsg").innerText="";
 
   document.querySelectorAll(".emotion").forEach(x=>x.classList.remove("active"));
   emotion="";
 }
 
-// helpers
-function status(msg){
-  document.getElementById("status").innerText=msg;
-}
-
+// calm
 function showCalm(){
   let c=document.getElementById("calm");
   c.style.display="flex";
-  setTimeout(()=>{c.style.display="none";},3000);
+
+  setTimeout(()=>{
+    c.style.display="none";
+  },3000);
 }
 
 </script>
